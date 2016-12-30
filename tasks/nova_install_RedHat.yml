@@ -1,0 +1,18 @@
+---
+# tasks file for nova install on RedHat
+
+- name: Install OpenStack nova controller packages.
+  yum:
+    name: "{{ item }}"
+    state: installed
+  with_items: "{{ nova_packages }}"
+  when:
+    - inventory_hostname in groups['nova_controller']
+
+- name: Install OpenStack nova compute kvm packages.
+  yum:
+    name: "{{ item }}"
+    state: installed
+  with_items: "{{ nova_compute_kvm_packages }}"
+  when:
+    - inventory_hostname in groups['nova_compute']

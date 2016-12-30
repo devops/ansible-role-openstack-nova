@@ -1,0 +1,22 @@
+---
+# tasks file for openstack-nova post install
+
+- name: Ensure openstack nova services is started and enabled at boot.
+  service:
+    name: "{{ item }}"
+    state: started
+    enabled: yes
+  with_items:
+    - "{{ nova_system_service_name }}"
+  when:
+    - inventory_hostname in groups['nova_controller']
+
+- name: Ensure openstack nova kvm compute services is started and enabled at boot.
+  service:
+    name: "{{ item }}"
+    state: started
+    enabled: yes
+  with_items:
+    - "{{ nova_compute_kvm_system_service_name }}"
+  when:
+    - inventory_hostname in groups['nova_compute']

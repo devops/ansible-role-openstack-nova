@@ -1,0 +1,62 @@
+---
+# tasks file for nova
+
+- name: configure libvirtd.conf.
+  lineinfile: >
+    dest="/etc/libvirt/libvirtd.conf"
+    regexp="{{ item.regexp }}"
+    line="{{ item.line }}"
+    state=present
+  with_items:
+    - { regexp: "^#?listen_tls", line: 'listen_tls = 0' }
+    - { regexp: "^#?listen_tcp", line: 'listen_tcp = 1' }
+    - { regexp: "^#?tcp_port", line: 'tcp_port = "16509"' }
+    - { regexp: "^#?auth_tcp", line: 'auth_tcp = "none"' }
+    - { regexp: "^#?mdns_adv", line: 'mdns_adv = 0' }
+
+- name: configure UUID for livirtd.conf.
+  shell: sed -i "/#host_uuid/ahost_uuid = \"`uuidgen`\"" /etc/libvirt/libvirtd.conf
+
+- name: configure sysconfig libvirtd.
+  lineinfile: >
+    dest="/etc/sysconfig/libvirtd"
+    regexp="{{ item.regexp }}"
+    line="{{ item.line }}"
+    state=present
+  with_items:
+    - { regexp: "^#?LIBVIRTD_ARGS", line: 'LIBVIRTD_ARGS="--listen"' }
+
+- name: Restart libvirtd service.
+  service:
+    name: "libvirtd"
+    state: restarted
+
+- name: Configure nova user.
+  shell: usermod -s /bin/bash nova
+
+- name: Configure nova user ssh-key.
+  authorized_key:
+    user: "nova" 
+    key: "{{ item }}"
+    path: "/var/lib/nova/.ssh/authorized_keys"
+  with_file:
+    - fetch/compute/id_rsa.pub
+
+- name: Copy id_rsa file to compute nodes.
+  copy:
+    src: fetch/compute/{{ item }}
+    dest: /var/lib/nova/.ssh/
+    group: nova
+    owner: nova
+    mode: 0600
+  with_items:
+    - id_rsa
+    - id_rsa.pub
+
+- name: Copy ssh config to compute nodes.
+  copy:
+    src: ssh.config
+    dest: /var/lib/nova/.ssh/config
+    group: nova
+    owner: nova
+    mode: 0600

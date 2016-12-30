@@ -1,0 +1,36 @@
+---
+# tasks file for ansible-role-openstack-nova
+
+# Variable setup.
+- name: Include OS-specific variables.
+  include_vars: "{{ ansible_os_family }}.yml"
+
+- include: nova_service_setup.yml
+  run_once: True
+  when:
+    - "inventory_hostname in groups['nova_controller']"
+
+# Setup/Install tasks.
+- include: nova_install_RedHat.yml
+  when: ansible_os_family == 'RedHat'
+
+# Configure tasks.
+- include: nova_configure.yml
+
+# DB tasks.
+- include: nova_db_setup.yml
+  when:
+    - "inventory_hostname in groups['nova_controller']"
+
+# Nova Compute
+- include: nova_compute.yml
+  when:
+    - "inventory_hostname in groups['nova_compute']"
+
+- include: nova_compute_ceph.yml
+  when:
+    - "inventory_hostname in groups['nova_compute']"
+    - "{{ nova_compute_ceph_config }}"
+
+# Finalize installation tasks.
+- include: nova_post_install.yml

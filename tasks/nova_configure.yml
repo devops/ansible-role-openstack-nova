@@ -1,0 +1,25 @@
+---
+- name: Configure nova controller.
+  shell: |
+    openstack-config --set "{{ nova_config_location }}" "{{ item.section }}" "{{ item.param }}" "{{ item.value }}"
+  with_items:
+    - "{{ nova_config }}"
+  when:
+    - inventory_hostname in groups['nova_controller']
+
+- name: Configure nova compute kvm.
+  shell: |
+    openstack-config --set "{{ nova_config_location }}" "{{ item.section }}" "{{ item.param }}" "{{ item.value }}"
+  with_items:
+    - "{{ nova_compute_kvm_config }}"
+  when:
+    - inventory_hostname in groups['nova_compute']
+
+- name: Configure nova compute to use ceph.
+  shell: |
+    openstack-config --set "{{ nova_config_location }}" "{{ item.section }}" "{{ item.param }}" "{{ item.value }}"
+  with_items:
+    - "{{ nova_compute_ceph_config }}"
+  when:
+    - inventory_hostname in groups['nova_compute']
+    - "{{ nova_compute_ceph_config }}"

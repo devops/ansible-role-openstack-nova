@@ -1,0 +1,32 @@
+---
+# tasks file for openstack-nova service setup
+
+- name: Create the service credentials for nova.
+  shell: |
+    openstack user create --domain default --password "{{ nova_keystone_password }}" "{{ nova_keystone_user }}"
+    openstack role add --project service --user {{ nova_keystone_user }} admin
+  environment:
+    - "{{ token_auth_env }}"
+
+- name: Create the service entity for nova.
+  shell: |
+    openstack service create --name "{{ nova_service_name }}" --description "{{ nova_service_description }}" "{{ nova_service_type }}"
+  environment:
+    - "{{ token_auth_env }}"
+
+# Create the API endpoint for nova.
+- name: Check if API endpoint exists for service "{{ nova_service_type }}"
+  shell: "openstack endpoint list --service {{ nova_service_type }}"
+  register: check_endpoint_result
+  environment:
+    - "{{ token_auth_env }}"
+  ignore_errors: True
+
+- name: "Specify API endpoints for {{ nova_service_type }} service"
+  when: check_endpoint_result.rc == 0
+  shell: |
+    openstack endpoint create --region {{ nova_service_region }} {{ nova_service_type }} public {{ nova_service_public_url }}
+    openstack endpoint create --region {{ nova_service_region }} {{ nova_service_type }} internal {{ nova_service_internal_url }}
+    openstack endpoint create --region {{ nova_service_region }} {{ nova_service_type }} admin {{ nova_service_admin_url }}
+  environment:
+    - "{{ token_auth_env }}"

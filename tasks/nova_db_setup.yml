@@ -1,0 +1,7 @@
+---
+# tasks file for nova DB Setup
+
+- name: DB sync for nova.
+  shell: su -s /bin/sh -c "nova-manage db sync" nova
+  ignore_errors: True
+  run_once: True
