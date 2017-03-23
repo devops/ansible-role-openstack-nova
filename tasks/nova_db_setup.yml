@@ -2,6 +2,10 @@
 # tasks file for nova DB Setup
 
 - name: DB sync for nova.
-  shell: su -s /bin/sh -c "nova-manage db sync" nova
+  shell: |
+    nova-manage api_db sync
+    nova-manage db sync
+  become: yes
+  become_user: "{{ nova_system_user_name }}"
   ignore_errors: True
   run_once: True

@@ -30,7 +30,7 @@
 - include: nova_compute_ceph.yml
   when:
     - "inventory_hostname in groups['nova_compute']"
-    - "{{ nova_compute_ceph_config }}"
+    - nova_compute_ceph_config
 
 # Finalize installation tasks.
 - include: nova_post_install.yml

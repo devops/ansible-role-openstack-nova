@@ -40,11 +40,11 @@
     key: "{{ item }}"
     path: "/var/lib/nova/.ssh/authorized_keys"
   with_file:
-    - fetch/compute/id_rsa.pub
+    - "{{ inventory_dir }}/fetch/compute/id_rsa.pub"
 
 - name: Copy id_rsa file to compute nodes.
   copy:
-    src: fetch/compute/{{ item }}
+    src: "{{ inventory_dir }}/fetch/compute/{{ item }}"
     dest: /var/lib/nova/.ssh/
     group: nova
     owner: nova

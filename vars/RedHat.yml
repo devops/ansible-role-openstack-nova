@@ -3,20 +3,16 @@
 
 nova_packages:
   - openstack-nova-api
-  - openstack-nova-cert
   - openstack-nova-conductor
   - openstack-nova-console
   - openstack-nova-novncproxy
   - openstack-nova-scheduler
-  - python-novaclient
 
 nova_compute_kvm_packages:
   - openstack-nova-compute
-  - sysfsutils
 
 nova_system_service_name:
   - openstack-nova-api
-  - openstack-nova-cert
   - openstack-nova-consoleauth
   - openstack-nova-scheduler
   - openstack-nova-conductor

@@ -1,6 +1,8 @@
 ---
 - name: Copy openstack ceph cinder key.
-  copy: src=fetch/{{ ceph_fsid }}/{{ groups['ceph-mon'][0] }}/etc/ceph/ceph.client.cinder.keyring dest=/etc/ceph/ceph.client.cinder.keyring
+  copy:
+    src: "{{ inventory_dir }}/fetch/{{ ceph_fsid }}/{{ groups['ceph-mon'][0] }}/etc/ceph/ceph.client.cinder.keyring"
+    dest: /etc/ceph/ceph.client.cinder.keyring
 
 - name: Copy  secret file.
   template: src=secret.xml.j2 dest=/tmp/secret.xml
